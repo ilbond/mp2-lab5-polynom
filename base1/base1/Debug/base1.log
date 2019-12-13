@@ -1,7 +1,17 @@
-﻿  polynom.cpp
-c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(29): warning C4018: <: несоответствие типов со знаком и без знака
-c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(40): warning C4018: <: несоответствие типов со знаком и без знака
-c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(102): warning C4018: <: несоответствие типов со знаком и без знака
-c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(125): warning C4244: =: преобразование "double" в "long", возможна потеря данных
-c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(263): warning C4172: возвращение адреса локальной или временной переменной : b
+﻿  base1.cpp
+  polynom.cpp
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(35): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(46): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(73): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(110): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(138): warning C4244: =: преобразование "double" в "long", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(380): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(384): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(388): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(394): warning C4244: -=: преобразование "double" в "long", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(418): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(422): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(426): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+c:\users\iailil\source\repos\mp2-lab5-polynom\base1\base1\polynom.cpp(432): warning C4244: +=: преобразование "double" в "long", возможна потеря данных
+  Создание кода...
   base1.vcxproj -> C:\Users\iailil\source\repos\mp2-lab5-polynom\base1\Debug\base1.exe

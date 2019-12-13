@@ -10,6 +10,12 @@ polynom::polynom()
 	pFirst->pNext = pFirst;
 }
 
+polynom::polynom(string &a) {
+	poly=a;
+	Record();
+	Cast();
+	Translate2String();
+}
 polynom::polynom(const polynom &a) {
 	poly = a.poly;
 	monom b(0,-1);
@@ -54,34 +60,34 @@ void polynom::InsertSpace() {
 	res += word;
 	poly = res;
 }
-void polynom::InputPolynom(string &a) {
+void polynom::InputPolynom(const string &a) {
 	poly = a;
 }
 
 void polynom::CheckPolynom() {
 	DeleteSpace();
-	char Word, PrevWord;
-	int i = 0,s=0;
+	InsertSpace();
+	string Word;// PrevWord;
+	int j = 0, s = 0, f = 0;
 	for (stringstream is(poly); is >> Word;) {
-		if (((Word < 43) || (Word > 57)) && ((Word < 120) || (Word > 122)) && (Word==42) && (Word == 44) && (Word == 47)) {
-			throw 1;
-		}
-		if ((Word >= 120) || (Word <= 122)) {
-			i++;
-			if ((PrevWord < 48) || (PrevWord > 57))
-				throw 1; 
-		}
-		if (Word == 46)
-			s++;
-		if ((i > 6)||(s>1))
-			throw 1;
-		if ((Word == 43) || (Word == 45)) {
-			i = 0;
-			s = 0;
-			if ((PrevWord < 48) || (PrevWord > 57))
+		for (int i = 0; i < Word.length(); i++) {
+			if (((Word[i] < 43) || (Word[i] > 57)) && ((Word[i] < 120) || (Word[i] > 122)) || (Word[i] == 42) || (Word[i] == 44) || (Word[i] == 47)) {
 				throw 1;
+			}
+			if ((j > 3) || (s > 1))
+				throw 1;
+			if ((Word[i] >= 120) && (Word[i] <= 122)) {
+				j = 0; f = 1;
+			}
+			if (Word[i] == 46)
+				s++;
+			if (f == 1) {
+			    if ((Word[i] >= 48) && (Word[i] <= 57)) {
+					j++;
+				}
+			}
 		}
-		PrevWord = Word;
+	    f = 0; s = 0; j = 0;
 	}
 }
 
@@ -91,42 +97,60 @@ bool comp(monom a, monom b)
 }
 
 void polynom::Record() {
-	//CheckPolynom();
-	InsertSpace();
+	CheckPolynom();
+	//InsertSpace();
 	vector<monom> p;
 	string Word;
-	int f=0;
+	int f = 0;
+	vector<int> v;
 	long int c; double b;
 	for (stringstream is(poly); is >> Word;) {
-		string strx, stry, strz, str;
+		string str[4] = {"0","0","0","0"};
+		bool r[4] = { false, false, false, false };
 		for (int i = 0; i < Word.length(); i++) {
 			
 			if (Word[i] == 120)
-				f = 3;
-			if (Word[i] == 121)
-				f = 2;
-			if (Word[i] == 122)
+			{
 				f = 1;
+				r[1] = true;
+			}
+			if (Word[i] == 121)
+			{
+				f = 2;
+				r[2] = true;
+			}
+			if (Word[i] == 122)
+			{
+				f = 3;
+				r[3] = true;
+			}
+				
 			if ((Word[i] >= 48) && (Word[i] <= 57)||(Word[i]==46)) {
-				if (f == 0) {
-					str += Word[i];
-				}
-				if (f == 3) {
-					strx += Word[i];
-				}
-				if (f == 2) {
-					stry += Word[i];
-				}
-				if (f == 1) {
-					strz += Word[i];
-				}
+					str[f] += Word[i];
+					v.push_back(f);
 			}
 		}
-		c = pow(max, 2)*atoi(strx.c_str()) + max * atoi(stry.c_str()) + atoi(strz.c_str());
+		for (int i = 0; i < 4; ++i)
+		{
+			if (r[i] && str[i] == "0")
+				str[i] += "1";
+		}
+		c = pow(max, 2)*atoi(str[1].c_str()) + max * atoi(str[2].c_str()) + atoi(str[3].c_str());
 		if (Word[0] == '-')
-			str = '-'+str;
-		stringstream s(str);
-		s >> b;
+			str[0] = '-' + str[0];
+
+		if (str[0] == "0")
+		{
+			b = 1;
+		}
+		else if (str[0] == "-0")
+		{
+			b = -1;
+		}
+		else {
+			stringstream s(str[0]);
+			s >> b;
+		}
 		monom a(b, c);
 		p.push_back(a);
 		f = 0;
@@ -136,15 +160,18 @@ void polynom::Record() {
 }
 
 void polynom::Translate2List(vector<monom> p) {
+	monom a(0, -1); 
+	pFirst = new Node(a);
+	pFirst->pNext = pFirst;
 	Node *tmp = pFirst;
-	monom a(0, -1);
+	Node *pp=new Node(a);
 	for (int i = 0; p.size(); i++) {
-		tmp->pNext = new Node(a,pFirst);
-		tmp->data = p.back();
+		pp = new Node(a,pFirst);
+		pp->data = p.back();
+		tmp->pNext = pp;
 		p.pop_back();
 		tmp = tmp->pNext;
 	}
-	pFirst = tmp;
 }
 
 vector<monom> polynom::Translate2Vector() {
@@ -157,24 +184,48 @@ vector<monom> polynom::Translate2Vector() {
 		tmp = tmp->pNext;
 		delete pp;
 	}
-	delete pFirst;
+ 	delete pFirst;
 	return p;
 }
 
 void polynom::Cast() {
 	Node *tmp = pFirst->pNext;
-	Node *pp;
-	while (tmp != pFirst) {
-		pp = tmp;
-		tmp = tmp->pNext;
-		if (pp->data.lay == tmp->data.lay) {
+	Node *pp = pFirst;
+	while (pp->pNext != pFirst) {
+		if (tmp->data.lay == pp->data.lay)
+		{
 			pp->data.c += tmp->data.c;
 			pp->pNext = tmp->pNext;
+			delete tmp;
+			tmp = pp->pNext;
+		}
+		else
+		{
+			pp = pp->pNext;
+			tmp = pp->pNext;
+		}
+	}
+	pp = pFirst->pNext;
+	Node *pr = pFirst;
+	while (pp != pFirst)
+	{
+		if (pp->data.c == 0)
+		{
+			pr->pNext = pp->pNext;
+			delete pp;
+			pp = pr->pNext;
+		}
+		else
+		{
+			pp = pp->pNext;
+			pr = pr->pNext;
 		}
 	}
 }
 
 polynom& polynom::operator=(const polynom &a) {
+	if (a.pFirst == pFirst)
+		return *this;
 	poly = a.poly;
 	Node *p = pFirst->pNext;
 	while (p != pFirst) {
@@ -190,6 +241,8 @@ polynom& polynom::operator=(const polynom &a) {
 		pp = pp->pNext;
 		p = p->pNext;
 	}
+	pp->pNext = pFirst;
+	Translate2String();
 	return *this;
 }
 polynom polynom::operator+(const polynom &a) {
@@ -197,22 +250,27 @@ polynom polynom::operator+(const polynom &a) {
 	polynom f(a);
 	monom m(0, -1);
 	Node *tmp = b.pFirst->pNext;
-	Node *pp=b.pFirst;
-	while (tmp != b.pFirst) {
-		pp = tmp;
+	Node *tmp2 = b.pFirst;
+	while (tmp != b.pFirst)
+	{
 		tmp = tmp->pNext;
+		tmp2 = tmp2->pNext;
 	}
-	pp->pNext = f.pFirst->pNext;
-	tmp= f.pFirst->pNext;
-	while (tmp != f.pFirst) {
-		pp = tmp;
-		tmp = tmp->pNext;
+	tmp2->pNext = f.pFirst->pNext;
+	tmp2 = tmp2->pNext;
+	while (tmp2->pNext != f.pFirst)
+	{
+		tmp2 = tmp2->pNext;
 	}
-	pp->pNext = b.pFirst;
+	tmp2->pNext = b.pFirst;
+	delete f.pFirst;
+	f.pFirst = new Node(m);
+	f.pFirst->pNext = f.pFirst;
 	vector<monom> v = b.Translate2Vector();
 	sort(v.begin(), v.end());
 	b.Translate2List(v);
 	b.Cast();
+	b.Translate2String();
 	return b;
 }
 
@@ -231,36 +289,48 @@ polynom polynom::operator-(const polynom &a) {
 	tmp2 = tmp2->pNext;
 	while (tmp2->pNext != f.pFirst)
 	{
+		tmp2->data.c *= (-1);
 		tmp2 = tmp2->pNext;
 	}
+	tmp2->data.c *= (-1);
 	tmp2->pNext = b.pFirst;
-	/*Node *tmp = b.pFirst->pNext;
-	Node *pp = b.pFirst;
-	while (tmp != b.pFirst) {
-		pp = tmp;
-		tmp = tmp->pNext;
-	}
-	pp->pNext = f.pFirst->pNext;
-	tmp = f.pFirst->pNext;
-	while (tmp != f.pFirst) {
-		tmp->data.c *= (-1);
-		pp = tmp;
-		tmp = tmp->pNext;
-	}
-	pp->pNext = b.pFirst;*/
 	delete f.pFirst;
 	f.pFirst = new Node(m);
 	f.pFirst->pNext = f.pFirst;
-	//vector<monom> v = b.Translate2Vector();
-	//sort(v.begin(), v.end());
-	//b.Translate2List(v);
-	//b.Cast();
+	vector<monom> v = b.Translate2Vector();
+	sort(v.begin(), v.end());
+	b.Translate2List(v);
+	b.Cast();
+	b.Translate2String();
 	return b;
 }
 
 polynom& polynom::operator+=(const polynom &a) {
-	polynom b;
-	return b;
+	polynom f(a);
+	monom m(0, -1);
+	Node *tmp = pFirst->pNext;
+	Node *tmp2 = pFirst;
+	while (tmp != pFirst)
+	{
+		tmp = tmp->pNext;
+		tmp2 = tmp2->pNext;
+	}
+	tmp2->pNext = f.pFirst->pNext;
+	tmp2 = tmp2->pNext;
+	while (tmp2->pNext != f.pFirst)
+	{
+		tmp2 = tmp2->pNext;
+	}
+	tmp2->pNext = pFirst;
+	delete f.pFirst;
+	f.pFirst = new Node(m);
+	f.pFirst->pNext = f.pFirst;
+	vector<monom> v = Translate2Vector();
+	sort(v.begin(), v.end());
+	Translate2List(v);
+	Cast();
+	Translate2String();
+	return *this;
 }
 
 polynom polynom::operator*(const double &a) {
@@ -270,36 +340,152 @@ polynom polynom::operator*(const double &a) {
 		p->data.c *= a;
 		p = p->pNext;
 	}
+	b.Translate2String();
 	return b;
 }
 
 polynom polynom::operator*(const polynom &a) {
 	polynom b;
 	polynom f(a);
-	//monom m(0, -1);
 	Node *p = pFirst->pNext;
 	Node *pp = f.pFirst->pNext;
-	//Node *tmp = new Node(m, pFirst);
 	Node *tmp = b.pFirst;
 	while (p != pFirst) {
 		while (pp != f.pFirst)
 		{
-			//tmp->data.c = p->data.c * pp->data.c;
-			//tmp->data.lay = p->data.lay + pp->data.lay;
-		
 			tmp->pNext = new Node({ p->data.c * pp->data.c, p->data.lay + pp->data.lay
 		}, tmp->pNext);
 			tmp = tmp->pNext;
 			pp = pp->pNext;
 		}
-	  //  pp = a.pFirst->pNext;
 		p = p->pNext;
-		//tmp = tmp->pNext;
+		pp = pp->pNext;
 	}
-	//b.pFirst = tmp;
+	vector<monom> v = b.Translate2Vector();
+	sort(v.begin(), v.end());
+	b.Translate2List(v);
+	b.Cast();
+	b.Translate2String();
 	return b;
 }
 
+polynom polynom::derative(const char &a) {
+	polynom b(*this);
+	int tmp = 120,i=0;
+	Node *p = b.pFirst->pNext;
+	Node *pp = b.pFirst;
+	while (p != b.pFirst) {
+		long int q = p->data.lay;
+		if (a == 122) {
+			int q1 = pow(max, 2);
+			q = q  % max;
+		}
+		if (a == 121) {
+			int q1 = pow(max, 2);
+			q = q / max % max;
+		}
+		if (a==120){
+			int q1 = pow(max, 2);
+			q = q / q1;
+			tmp++;
+		}
+		int w = q;
+		p->data.c *= w;
+		p->data.lay -= pow(max, 122 - a);
+		if (q == 0) {
+			pp->pNext = p->pNext;
+			delete p;
+			p = pp->pNext;
+		}
+		else
+		    p = p->pNext;
+		pp = pp->pNext;
+	}
+	b.Translate2String();
+	return b;
+}
+
+polynom polynom::integration(const char &a) {
+	polynom b(*this);
+	int tmp = 120, i = 1;
+	Node *p = b.pFirst->pNext;
+	while (a >= tmp) {
+		tmp++;
+	}
+	while (p != b.pFirst) {
+		long int q = p->data.lay;
+		if (a == 122) {
+			int q1 = pow(max, 2);
+			q = q % max;
+		}
+		if (a == 121) {
+			int q1 = pow(max, 2);
+			q = q / max % max;
+		}
+		if (a == 120) {
+			int q1 = pow(max, 2);
+			q = q / q1;
+			tmp++;
+		}
+		int w = q+1;
+		p->data.c *= 1/ static_cast<double>(w);;
+		p->data.lay += pow(max, 122 - a);
+		p = p->pNext;
+	}
+	b.Translate2String();
+	return b;
+}
+
+void polynom::Translate2String() {
+	Node *p = pFirst->pNext;
+	string str;
+	while (p != pFirst) {
+		string tmp;
+		if (p->data.c > 0) {
+			str += "+";
+		}
+		tmp = to_string(p->data.c);
+		str += tmp;
+		if (p->data.lay / static_cast<int>(pow(max, 2)) != 0) {
+			str += "x";
+			if (p->data.lay / static_cast<int>(pow(max, 2)) > 1) {
+				tmp = to_string(p->data.lay / static_cast<int>(pow(max, 2)));
+				str += tmp;
+			}
+		}
+		if (((p->data.lay / static_cast<int>(pow(max, 1)))% static_cast<int>(pow(max, 1))) != 0) {
+			str += "y";
+			if (((p->data.lay / static_cast<int>(pow(max, 1))) % static_cast<int>(pow(max, 1))) > 1) {
+				tmp = to_string((p->data.lay / static_cast<int>(pow(max, 1))) % static_cast<int>(pow(max, 1)));
+				str += tmp;
+			}
+		}
+		if ((p->data.lay % max) != 0) {
+			str += "z";
+			if ((p->data.lay % max) > 1) {
+				tmp = to_string(p->data.lay % max);
+				str += tmp;
+			}
+		}
+		p = p->pNext;
+	}
+	poly = str;
+}
+
+double polynom::Calculate(const double a[]) {
+	double res=0;
+	Node *p = pFirst->pNext;
+	while (p != pFirst) {
+		double tmp=0;
+		int px = p->data.lay / static_cast<int>(pow(max, 2));
+		int py = (p->data.lay / static_cast<int>(pow(max, 1))) % static_cast<int>(pow(max, 1));
+		int pz = p->data.lay % max;
+		tmp += p->data.c*pow(a[0],px)*pow(a[1],py)*pow(a[2],pz);
+		res += tmp;
+		p = p->pNext;
+	}
+	return res;
+}
 polynom::~polynom()
 {
 	Node *p = pFirst->pNext;

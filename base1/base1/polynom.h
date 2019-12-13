@@ -40,7 +40,7 @@ public:
 
 class polynom
 {
-	int max = 10;
+	int max = 999;
 	class Node
 	{
 	public:
@@ -60,6 +60,8 @@ class polynom
 	string poly;
 public:
 	polynom();
+	polynom(string &a);
+	string GetString() { return poly; }
 	polynom(const polynom &a);
 	polynom &operator=(const polynom &a);
 	polynom operator+(const polynom &a);
@@ -72,11 +74,13 @@ public:
 	void DeleteSpace();
 	void InsertSpace();
 	void CheckPolynom();
-	void InputPolynom(string &a);
+	void InputPolynom(const string &a);
 	void Record();
 	void Translate2List(vector<monom> p);
 	vector<monom> Translate2Vector();
 	void Cast();
+	void Translate2String();
+	double Calculate(const double a[]);
 	~polynom();
 };
 
